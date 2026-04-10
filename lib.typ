@@ -76,6 +76,7 @@
   let fallback_dicionary = (
     w-and: "and",
     w-by: "by",
+    w-of: "of",
     prop-title: "Props",
     todo-title: "TODOs",
     dramatis-personae-title: "Dramatis Personae",
@@ -89,6 +90,7 @@
       (
         w-and: "und",
         w-by: "von",
+        w-of: "von",
         prop-title: "Requisiten",
         todo-title: "TODOs",
         dramatis-personae-title: "Figuren",
@@ -100,6 +102,7 @@
       (
         w-and: "e",
         w-by: "di",
+        w-of: "di",
         prop-title: "Oggetti di scena",
         todo-title: "TODOs",
         dramatis-personae-title: "Personaggi",
@@ -162,7 +165,7 @@
         ]
         align(
           center,
-          counter(page).display((a, b) => [#a von #b], both:true)
+          counter(page).display((a, b) => [#a #localization("w-of") #b], both:true)
         )
       }
     },
