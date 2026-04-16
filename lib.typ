@@ -346,7 +346,23 @@
       .map(ts => {
         ts.value
       })
-      .dedup()
+      .fold((:), (acc, s) => {
+      let key = s.t.join("|")
+
+      if key in acc {
+        let existing = acc.at(key)
+
+        if existing.s_d == none or existing.s_d == "" {
+          if s.s_d != none and s.s_d != "" {
+            acc.insert(key, s)
+          }
+        }
+      } else {
+        acc.insert(key, s)
+      }
+      acc 
+    })
+    .values()
 
       if (roles.len() > 0) {
         page(header: none, footer: none)[
