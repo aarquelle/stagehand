@@ -40,7 +40,7 @@
   descriptor: none,
   authors: none,
   font: "Libertinus Serif",
-  font-size:14pt,
+  font-size: 14pt,
   toc: true,
   dramatis-personae: true,
   props: true,
@@ -231,7 +231,7 @@
                       query(selector(<tagged_speaker>)
                         .after(start_scene.location())
                         .before(end_scene.location()))
-                        .map(s => s.value)
+                        .map(s => s.value.t)
                         .flatten()
                         .map(s => to-string(s))
                         .dedup().join(", ")
@@ -359,14 +359,36 @@
   if dramatis-personae {
     context {
       let roles = query(<tagged_speaker>)
-            .map(t => t.value)
-            .flatten()
-            .dedup()
+      .map(ts => {
+        ts.value
+      })
+      .fold((:), (acc, s) => {
+      let key = s.t.join("|")
+
+      if key in acc {
+        let existing = acc.at(key)
+
+        if existing.s_d == none or existing.s_d == "" {
+          if s.s_d != none and s.s_d != "" {
+            acc.insert(key, s)
+          }
+        }
+      } else {
+        acc.insert(key, s)
+      }
+      acc 
+    })
+    .values()
+
       if (roles.len() > 0) {
         page(header: none, footer: none)[
           #heading(numbering: none, localization("dramatis-personae-title"))
           \
-          #list(..roles)
+          #list(..roles.map((s) =>
+                [
+                  #s.t.join(", ") #box(width: 1fr, inset: 0pt)[#repeat[.]] #s.s_d
+                ]
+          ))
         ]
       }
     }
@@ -453,7 +475,7 @@
 
 
 
-#let speaker(name, p: none, t: auto) = {
+#let speaker(name, p: none, t: auto, s_d: none) = {
   if t != false {
     if t == auto {
       t = name
@@ -474,7 +496,7 @@
   }
   [
     #name<speaker>
-    #if t != false [#metadata(t)<tagged_speaker>]
+    #if t != false [#metadata((t: t, s_d: s_d))<tagged_speaker>]
     #if(p != none) [
         #p<parenthetical>
     ]
