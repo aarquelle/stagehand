@@ -4,14 +4,14 @@
       #block(spacing: (0.0em))[
         #align(left)[
           #par(justify: true, spacing: 0.0em)[
-            #text(style: "italic", gray)[#body]
+            #body #label("_stage-direction")
             ]
           ]
         ]
       ]
     )
   } else {
-    text(style: "italic", gray)[#body]
+    [#body #label("_stage-direction")]
   }
 }
 
@@ -50,6 +50,7 @@
   speaker-function: smallcaps,
   break-size: 900,
   parentheses-mean-stage-directions: true,
+  stage-direction-color: gray,
   has-header:true,
   has-footer: true,
   speakers-in-header: true,
@@ -72,6 +73,8 @@
       word => upper(word.text.first()) + lower(word.text.slice(1)),
     )
   }
+
+  show <_stage-direction>: set text(stage-direction-color)
 
   let fallback_dicionary = (
     w-and: "and",
