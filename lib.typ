@@ -35,7 +35,7 @@
 }
 
 #let stagehand(
-  lang:"en",
+  lang: "en",
   title: none,
   descriptor: none,
   authors: none,
@@ -76,6 +76,7 @@
   let fallback_dicionary = (
     w-and: "and",
     w-by: "by",
+    w-of: "of",
     prop-title: "Props",
     todo-title: "TODOs",
     dramatis-personae-title: "Dramatis Personae",
@@ -85,10 +86,11 @@
   )
 
   let primary_dictionary = {
-    if lang == "de" {
+    if lower(lang) == "de" {
       (
         w-and: "und",
         w-by: "von",
+        w-of: "von",
         prop-title: "Requisiten",
         todo-title: "TODOs",
         dramatis-personae-title: "Figuren",
@@ -96,10 +98,11 @@
         scene-title: "Szene",
         appendix-title: "Anhang"
       )
-    } else if lang == "it" {
+    } else if lower(lang) == "it" {
       (
         w-and: "e",
         w-by: "di",
+        w-of: "di",
         prop-title: "Oggetti di scena",
         todo-title: "TODOs",
         dramatis-personae-title: "Personaggi",
@@ -107,7 +110,19 @@
         scene-title: "Scena",
         appendix-title: "Appendice",
       )
-    } else if lang == "en" {
+    } else if lower(lang) == "es" {
+      (
+        w-and: "y",
+        w-by: "por",
+        w-of: "de",
+        prop-title: "Utilería",
+        todo-title: "TODOs",
+        dramatis-personae-title: "Personajes",
+        act-title: "Acto",
+        scene-title: "Escena",
+        appendix-title: "Apéndice",
+      )
+    } else if lower(lang) == "en" {
       fallback_dicionary
     } else {
       fallback_dicionary
@@ -162,7 +177,7 @@
         ]
         align(
           center,
-          counter(page).display((a, b) => [#a von #b], both:true)
+          counter(page).display((a, b) => [#a #localization("w-of") #b], both:true)
         )
       }
     },
