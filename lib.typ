@@ -50,7 +50,7 @@
   speaker-function: smallcaps,
   break-size: 900,
   parentheses-mean-stage-directions: true,
-  stage-direction-color: gray,
+  stage-direction-style: it => text(style: "italic", gray)[#it],
   has-header:true,
   has-footer: true,
   speakers-in-header: true,
@@ -66,10 +66,11 @@
   assert(
     type(custom-localization) == dictionary or custom-localization == none,
     message: "A custom localization must be a dictionary or 'none'")
-  assert(
-    type(stage-direction-color) == color,
-    message: "Stage direction color must be of type 'color' "
-  )
+
+    assert(
+      type(stage-direction-style) == function,
+      message: "Stage direction styling be a function which resolves like 'text(/YOUR STYLES/)[#it]'")
+
 
   let title-case(string) = {
     return string.replace(
@@ -78,7 +79,7 @@
     )
   }
 
-  show <_stage-direction>: set text(style: "italic", stage-direction-color)
+  show <_stage-direction>: it => stage-direction-style(it)
 
   let fallback_dicionary = (
     w-and: "and",
