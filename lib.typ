@@ -67,6 +67,11 @@
     type(custom-localization) == dictionary or custom-localization == none,
     message: "A custom localization must be a dictionary or 'none'")
 
+    assert(
+      type(stage-direction-style) == function,
+      message: "Stage direction styling be a function which resolves like 'text(/YOUR STYLES/)[#it]'")
+
+
   let title-case(string) = {
     return string.replace(
       regex("[A-Za-z]+('[A-Za-z]+)?"),
