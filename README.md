@@ -92,6 +92,7 @@ You can adjust the `stagehand` function using the `with` function, as seen in th
 |speaker-function|function|smallcaps|Which function to use on character names. You could, for example, use `upper` to transform all characters to capital letters.|
 |break-size|int|900|After how many characters a paragraph should be allowed to split at a page break. Paragraphs below this limit will always stay together.|
 |parentheses-mean-stage-directions|boolean|true|If true, using round parentheses in markup mode will mark text as an inline stage direction.|
+|stage-direction-color|color|gray|The text color of stage directions|
 |has-header|boolean|true|Whether to create a header on each page|
 |has-footer|boolean|true|Whether to create a footer on each page|
 |speakers-in-header|boolean|true|Whether to add the names of speakers to the header|
