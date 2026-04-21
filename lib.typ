@@ -3,7 +3,7 @@
     align(center, box(width: 70%)[
       #block(spacing: (0.0em))[
         #align(left)[
-          #par(justify: true, spacing: 0.0em)[
+          #par(justify: true, spacing: 0.0em, hanging-indent: 0em)[
             #body #label("_stage-direction")
             ]
           ]
@@ -32,6 +32,14 @@
   } else if it == [ ] {
     ""
   }
+}
+
+#let longest-speaker() = {
+  query(selector(<speaker>))
+    .map(s => to-string(s))
+    .fold("", (longest, current) =>
+      if current.len() > longest.len() { current } else { longest }
+    )
 }
 
 #let stagehand(
@@ -278,9 +286,14 @@
         )
       ]
     } else if speaker-layout == "concise"{
+      let indent-width = measure(
+        speaker-function[#longest-speaker():]
+      ).width - measure(speaker-function[#it:]
+      ).width - measure([:]).width
+
       speaker-function[
 
-        #it:]
+        #it:#h(indent-width + 1em)]
     }
   }
 
@@ -406,7 +419,20 @@
   }
 
   [#v(0pt)<start_of_play>]
-  play
+
+  context {
+    let indent-width = measure(
+      speaker-function[#longest-speaker():]
+    ).width + 1em
+    
+    set par(
+      justify: true,
+      linebreaks: "optimized",
+      hanging-indent: if speaker-layout == "concise" { indent-width } else { 0em },
+    )
+
+    play
+  }
 
   [#v(0pt)<end_of_play>]
   set page(header: none, footer: none)
