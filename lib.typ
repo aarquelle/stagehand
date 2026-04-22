@@ -1,3 +1,5 @@
+#let _description-state = state("description-state", ().to-dict() )
+
 #let stage-direction(blocked: true, body) = {
   if blocked {
     align(center, box(width: 70%)[
@@ -13,6 +15,15 @@
   } else {
     [#body #label("_stage-direction")]
   }
+}
+
+#let descriptions(..roles) = {
+  let all-descriptions = ().to-dict()
+  for role in roles.pos() {
+    let name = role.at("name").replace(" ", sym.space.nobreak)
+    all-descriptions.insert(name, role)
+  }
+  _description-state.update(all-descriptions)
 }
 
 #let to-string(it) = {
@@ -358,15 +369,47 @@
 
   if dramatis-personae {
     context {
-      let roles = query(<tagged_speaker>)
+      let rolenames = query(<tagged_speaker>)
             .map(t => t.value)
             .flatten()
             .dedup()
-      if (roles.len() > 0) {
+      if (rolenames.len() > 0) {
         page(header: none, footer: none)[
           #heading(numbering: none, localization("dramatis-personae-title"))
           \
-          #list(..roles)
+          #{
+            let groups = ().to-dict()
+
+            for rolename in rolenames {
+              let detailed-role = _description-state.get().at(rolename, default:(name:rolename))
+              let group-name = detailed-role.at("group", default: "None")
+              if group-name not in groups {
+                groups.insert(group-name, ())
+              }
+              groups.at(group-name).push(detailed-role)
+            }
+
+            show table.cell.where(x: 1): align.with(center)
+            show table.cell.where(x: 2): align.with(right)
+            show table.cell.where(x: 1): it => emph(text(gray, it))
+
+            for group-name in groups.keys() {
+              align(center, strong(
+                if group-name != "None" {group-name} else {none}
+              ))
+              let cells = ()
+              for role in groups.at(group-name) {
+                cells.push(role.name)
+                cells.push(role.at("desc", default: none))
+                cells.push(role.at("actor", default: none))
+                //cells.push()
+              }
+
+              table(columns:(1fr, 1fr, 1fr), stroke:none,
+                ..cells
+              )
+            }
+          }
         ]
       }
     }

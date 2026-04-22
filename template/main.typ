@@ -1,4 +1,10 @@
-#import "@preview/stagehand:0.1.0":*
+#import "@preview/stagehand:0.1.1":*
+
+#descriptions(
+  (name:"Alice", group:"Nerds", desc:"A Nerd called Alice", actor:"Andrea"),
+  (name:"Bob", group:"Jocks", desc:"A jock named Boris", actor:"Boris"),
+  (name:"Cedric", group:"Nerds", desc:"Another Nerd", actor:"Celine")
+)
 
 #show: stagehand.with(
   title: "A Template for Theatre",
@@ -40,7 +46,7 @@ I'd rather wear my emotions on the sleeve, and put them right behind my name.
 The command takes an optional parameter: 'blocked'. If 'blocked' is false, it looks like this: #stage-direction(blocked: false)[He gestures around in a surprising lack of parentheses.]
 #speaker[Alice]
 Instead of having to write "\#speaker" and "\#stage-direction" all the time, we can import these names with dedicated aliases:
-#import "@preview/stagehand:0.1.0":stage-direction as d, speaker as s
+#import "@preview/stagehand:0.1.1":stage-direction as d, speaker as s
 #d[Alice uses some magic and imports the command with a new name.]
 #s[Bob]
 We can also define functions for our names, so we don't have to write them out all the time.
@@ -64,3 +70,8 @@ Please fasten your seatbelts.
 #alice() They also show up at the end of the document, in their dedicated list. You can click on them, to go back here.
 #bob() There are many options to play around in the ```typ #show: theatre.with(...)
 ``` block at the start of the page. Almost all of these options are set to their default values, so you can remove them if you want to. #todo[Change some default values]
+== Or is there more?
+#s[Xaver]
+Ich bin auch hier
+#s[Cedric]
+Ich auch.
