@@ -69,8 +69,8 @@
   ),
   play
 ) = {
-  assert(speaker-layout in ("fancy", "concise"),
-  message: "speaker-layout must be fancy or concise")
+  assert(speaker-layout in ("fancy", "concise", "blockage"),
+  message: "speaker-layout must be fancy, concise or blockage")
   assert(
     type(custom-localization) == dictionary or custom-localization == none,
     message: "A custom localization must be a dictionary or 'none'")
@@ -286,6 +286,10 @@
         )
       ]
     } else if speaker-layout == "concise"{
+        speaker-function[
+
+          #it:]
+    } else if speaker-layout == "blockage"{
       let indent-width = measure(
         speaker-function[#longest-speaker():]
       ).width - measure(speaker-function[#it:]
@@ -304,7 +308,7 @@
           #stage-direction(blocked: false)[(#it)]
         ]
       ]
-    } else if speaker-layout == "concise" {
+    } else if speaker-layout == "concise" or speaker-layout == "blockage"{
       stage-direction(blocked: false)[(#it)]
     }
   }
@@ -428,7 +432,7 @@
     set par(
       justify: true,
       linebreaks: "optimized",
-      hanging-indent: if speaker-layout == "concise" { indent-width } else { 0em },
+      hanging-indent: if speaker-layout == "blockage" { indent-width } else { 0em },
     )
 
     play
