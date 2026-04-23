@@ -3,7 +3,7 @@
     align(center, box(width: 70%)[
       #block(spacing: (0.0em))[
         #align(left)[
-          #par(justify: true, spacing: 0.0em)[
+          #par(justify: true, spacing: 0.0em, hanging-indent: 0em)[
             #body #label("_stage-direction")
             ]
           ]
@@ -34,6 +34,15 @@
   }
 }
 
+#let longest-speaker() = {
+  query(selector(<speaker>))
+    .map(s => to-string(s))
+    .fold("", (longest, current) =>
+      if current.len() > longest.len() { current } else { longest }
+    )
+    
+}
+
 #let stagehand(
   lang: "en",
   title: none,
@@ -61,8 +70,8 @@
   ),
   play
 ) = {
-  assert(speaker-layout in ("fancy", "concise"),
-  message: "speaker-layout must be fancy or concise")
+  assert(speaker-layout in ("fancy", "concise", "blockage"),
+  message: "speaker-layout must be fancy, concise or blockage")
   assert(
     type(custom-localization) == dictionary or custom-localization == none,
     message: "A custom localization must be a dictionary or 'none'")
@@ -201,7 +210,7 @@
             if speakers-in-header {
               pad(bottom:-8pt,
                 align(center + top,
-                  par(justify: false,
+                  par(justify: false, hanging-indent: 0em,
                     text(size: 11pt, hyphenate:false, {
                       let end_scene
                       let start_scene
@@ -278,9 +287,20 @@
         )
       ]
     } else if speaker-layout == "concise"{
-      speaker-function[
+        speaker-function[
 
-        #it:]
+          #it:]
+    } else if speaker-layout == "blockage"{
+        let indent-width = calc.min(
+          12em.to-absolute(),  (measure(
+          speaker-function[#longest-speaker():]
+        ).width + 1em).to-absolute()
+        ) - measure(speaker-function[#it:]
+        ).width - measure([:]).width
+
+        speaker-function[
+
+          #it:#h(indent-width)]
     }
   }
 
@@ -291,7 +311,7 @@
           #stage-direction(blocked: false)[(#it)]
         ]
       ]
-    } else if speaker-layout == "concise" {
+    } else if speaker-layout == "concise" or speaker-layout == "blockage"{
       stage-direction(blocked: false)[(#it)]
     }
   }
@@ -406,7 +426,20 @@
   }
 
   [#v(0pt)<start_of_play>]
-  play
+
+  context {
+    let indent-width = (measure(
+      speaker-function[#longest-speaker():]
+    ).width + 1em).to-absolute()
+    
+    set par(
+      justify: true,
+      linebreaks: "optimized",
+      hanging-indent: if speaker-layout == "blockage" { calc.min(12em.to-absolute(), indent-width) } else { 0em },
+    )
+
+    play
+  }
 
   [#v(0pt)<end_of_play>]
   set page(header: none, footer: none)
