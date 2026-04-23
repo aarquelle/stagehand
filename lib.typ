@@ -40,6 +40,7 @@
     .fold("", (longest, current) =>
       if current.len() > longest.len() { current } else { longest }
     )
+    
 }
 
 #let stagehand(
@@ -290,14 +291,16 @@
 
           #it:]
     } else if speaker-layout == "blockage"{
-      let indent-width = measure(
-        speaker-function[#longest-speaker():]
-      ).width - measure(speaker-function[#it:]
-      ).width - measure([:]).width
+        let indent-width = calc.min(
+          12em.to-absolute(),  (measure(
+          speaker-function[#longest-speaker():]
+        ).width + 1em).to-absolute()
+        ) - measure(speaker-function[#it:]
+        ).width - measure([:]).width
 
-      speaker-function[
+        speaker-function[
 
-        #it:#h(indent-width + 1em)]
+          #it:#h(indent-width)]
     }
   }
 
@@ -425,14 +428,14 @@
   [#v(0pt)<start_of_play>]
 
   context {
-    let indent-width = measure(
+    let indent-width = (measure(
       speaker-function[#longest-speaker():]
-    ).width + 1em
+    ).width + 1em).to-absolute()
     
     set par(
       justify: true,
       linebreaks: "optimized",
-      hanging-indent: if speaker-layout == "blockage" { indent-width } else { 0em },
+      hanging-indent: if speaker-layout == "blockage" { calc.min(12em.to-absolute(), indent-width) } else { 0em },
     )
 
     play
