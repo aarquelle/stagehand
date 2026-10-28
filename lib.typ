@@ -618,36 +618,48 @@
     context {
       let props-list = query(selector(<prop>).before(<end_of_play>))
       let todos-list = query(selector(<todo>).before(<end_of_play>))
-      if props-list.len() > 0 or todos-list.len() > 0 {[
-        = #localization("appendix-title")
-      ]
-      if props {
-        if props-list.len() > 0 [
-            == #localization("prop-title"):
-            #{
-              props-list.map(it => [#link(it.location())[#it]
-              #box(width: 1fr)[#line(length: 100%, stroke: (dash: "loosely-dotted"))]
-              #numbering("1", counter(page).at(it.location()).first())
-            ]).join("\n") + "\n"
-            }
+
+      if props-list.len() > 0 or todos-list.len() > 0 {
+        heading(level: 1, numbering: none)[
+          #localization("appendix-title")
+        ]
+      }
+
+      if props and props-list.len() > 0 {
+        heading(level: 2, numbering: none)[
+           #localization("prop-title")
+        ]
+
+        for it in props-list {
+	  block(breakable: true)[
+            #link(it.location())[#it]
+            #box(width: 1fr)[
+              #line(length: 100%, stroke: (dash: "loosely-dotted"))
+            ]
+            #numbering("1", counter(page).at(it.location()).first())
+	    ]
+          }
+      }
+
+      if todos and todos-list.len() > 0 {
+        heading(level: 2, numbering: none)[
+          #localization("todo-title")
+        ]
+
+        for it in todos-list {
+          block(breakable: true)[
+            #link(it.location(), to-string(it))
+            #box(width: 1fr)[
+              #line(length: 100%, stroke: (dash: "loosely-dotted"))
+            ]
+            #numbering("1", counter(page).at(it.location()).first())
           ]
         }
-      }
-      if todos {
-      //todos-list.map(it => link(it.location(), to-string(it))).join("\n")
-        if todos-list.len() > 0 [
-            == #localization("todo-title"):
-            #{
-              todos-list.map(it => [#link(it.location(), to-string(it))
-              #box(width: 1fr)[#line(length: 100%, stroke: (dash: "loosely-dotted"))]
-              #numbering("1", counter(page).at(it.location()).first())
-            ]).join("\n") + "\n"
-            }
-          ]
       }
     }
   }
 }
+
 
 
 
