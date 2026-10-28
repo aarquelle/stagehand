@@ -80,6 +80,34 @@
 
 }
 
+#let speaker(name, p: none, t: auto) = {
+  if t != false {
+    if t == auto {
+      t = name
+    }
+    if type(t) == content {
+      t = to-string(t)
+    }
+    if type(t) == str {
+      t = (t.replace(" ", sym.space.nobreak), )
+    } else {
+      t = t.map(it => {
+        if type(it) == content {
+          it = to-string(it)
+        }
+        return it.replace(" ", sym.space.nobreak)
+      })
+    }
+  }
+  [
+    #name<speaker>
+    #if t != false [#metadata(t)<tagged_speaker>]
+    #if(p != none) [
+        #p<parenthetical>
+    ]
+  ]
+}
+
 #let stage-direction(blocked: true, body) = context {
   let indent-width = calc.min((measure(
         _speaker-function.get()([#longest-speaker():])
@@ -132,6 +160,7 @@
   speaker-function: smallcaps,
   break-size: 900,
   parentheses-mean-stage-directions: true,
+  index-means-speaker: true,
   stage-direction-color: gray,
   has-header:true,
   has-footer: true,
@@ -616,6 +645,23 @@
     }
   }}
 
+  show terms.item: it => {
+    if index-means-speaker {
+
+      let p-regex = regex("\([^\)]*\)")
+      let t-regex = regex("\[[^\]]*\]")
+        let p = to-string(it.term).matches(p-regex).map(i => i.text.slice(1, -1)).join(", ")
+      let t = to-string(it.term).matches(t-regex).map(i => i.text.slice(1, -1))
+      speaker(to-string(it.term).replace(p-regex, "").replace(t-regex, ""),
+        p: p,
+        t: if t.len() > 0 {t} else {auto}
+      )
+      it.description
+    } else {
+      it
+    }
+  }
+
   context {
     let indent-width = (measure(
       speaker-function[#longest-speaker():]
@@ -686,37 +732,6 @@
       }
     }
   }
-}
-
-
-
-
-#let speaker(name, p: none, t: auto) = {
-  if t != false {
-    if t == auto {
-      t = name
-    }
-    if type(t) == content {
-      t = to-string(t)
-    }
-    if type(t) == str {
-      t = (t.replace(" ", sym.space.nobreak), )
-    } else {
-      t = t.map(it => {
-        if type(it) == content {
-          it = to-string(it)
-        }
-        return it.replace(" ", sym.space.nobreak)
-      })
-    }
-  }
-  [
-    #name<speaker>
-    #if t != false [#metadata(t)<tagged_speaker>]
-    #if(p != none) [
-        #p<parenthetical>
-    ]
-  ]
 }
 
 
