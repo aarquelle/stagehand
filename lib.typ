@@ -384,8 +384,36 @@
     lang: lang,
   )
 
-  set heading(numbering: "I - 1")
+  set heading(numbering: (..nums) => {
+    let nums = nums.pos()
 
+    if nums.len() == 1 {
+      numbering(
+        chapter-settings.at(0).at("numbering", default: "I"),
+        nums.at(0),
+      )
+    } else if nums.len() >= 2 {
+      let act = nums.at(0)
+      let scene = nums.at(1)
+
+      let scene-number = numbering(
+        chapter-settings.at(1).at("numbering", default: "1"),
+        scene,
+      )
+
+      if act > 0 {
+        let act-number = numbering(
+          chapter-settings.at(0).at("numbering", default: "I"),
+          act,
+        )
+        [#act-number - #scene-number]
+      } else {
+        scene-number
+      }
+    }
+  })
+
+  
   show heading: set align(center)
 
   //TODO Nur unterstes Level outlinen
