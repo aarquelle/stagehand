@@ -570,11 +570,25 @@
 
   show par: it => {
     let content = to-string(it.body)
-    let characters = 0
-    if type(content) == str{
-      characters = content.len()
+
+    if type(content) != str {
+      it
+    } else {
+      let trimmed = content.trim()
+
+      let is-stage-direction = trimmed.match(
+        regex("^\\([^)]+\\)$")
+      ) != none
+
+      if parentheses-mean-stage-directions and is-stage-direction {
+        stage-direction(blocked: true)[
+          #trimmed.slice(1, -1)
+        ]
+      } else {
+        let characters = content.len()
+        block(breakable: characters > break-size)[#it]
+      }
     }
-    block(breakable: characters > break-size)[#it]
   }
 
 
