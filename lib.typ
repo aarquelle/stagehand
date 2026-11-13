@@ -25,6 +25,15 @@
   }
 }
 
+#let is-parenthesized-paragraph(body) = {
+  let content = to-string(body)
+  if type(content) != str {
+    return false
+  }
+  let trimmed = content.trim()
+  trimmed.starts-with("(") and trimmed.ends-with(")")
+}
+
 #let centered(body) = align(center, par(hanging-indent: 0pt, body))
 
 #let todo(body) = [#body<todo>]
@@ -568,14 +577,17 @@
 
   set par(justify: true, linebreaks: "optimized",)
 
-  show par: it => {
-    let content = to-string(it.body)
-    let characters = 0
-    if type(content) == str{
-      characters = content.len()
-    }
-    block(breakable: characters > break-size)[#it]
+#let is-parenthesized-paragraph(body) = {
+  let content = to-string(body)
+
+  if type(content) != str {
+    return false
   }
+
+  let trimmed = content.trim()
+
+  trimmed.starts-with("(") and trimmed.ends-with(")")
+}
 
 
   [#v(0pt)<start_of_play>]
