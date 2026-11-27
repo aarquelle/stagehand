@@ -630,7 +630,7 @@
       } else if speaker-layout == "blockage" {
         let label = speaker-function[#it:]
         let gap = calc.max(
-          indent-width - measure(label).width - measure(":").width,
+          indent-width - measure(label).width - measure[#sym.space.nobreak].width,
           0pt
         )
         label + h(gap)
