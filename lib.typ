@@ -440,12 +440,6 @@
     }
   }
 
-  show regex("\\([^)]+\\)"): it => {
-    if parentheses-mean-stage-directions {
-      stage-direction(blocked: false, it)
-    } else {it}
-  }
-
 
   //Title page
   if title != none or descriptor != none or authors != none {
@@ -573,11 +567,34 @@
 
   show par: it => {
     let content = to-string(it.body)
-    let characters = 0
-    if type(content) == str{
-      characters = content.len()
+
+    let direction = if type(content) == str {
+      content.match(
+        regex("^\\s*\\(\\s*(.+)\\s*\\)\\s*$")
+      )
+    } else {
+      none
     }
-    block(breakable: characters > break-size)[#it]
+
+    if parentheses-mean-stage-directions and direction != none {
+      stage-direction(blocked: true)[
+        #direction.captures.at(0)
+      ]
+    } else {
+      let characters = if type(content) == str {
+        content.len()
+      } else {
+        0
+      }
+
+      block(breakable: characters > break-size)[#it]
+    }
+  }
+
+  show regex("\\(.+\\)"): it => {
+    if parentheses-mean-stage-directions {
+      stage-direction(blocked: false, it)
+    } else {it}
   }
 
 
@@ -590,6 +607,7 @@
       }
     }
   }}
+
 
   context {
     let indent-width = calc.min(
@@ -612,17 +630,16 @@
       } else if speaker-layout == "blockage" {
         let label = speaker-function[#it:]
         let gap = calc.max(
-          indent-width - measure(label).width,
+          indent-width - measure(label).width - measure(":").width,
           0pt
         )
-        label
-        h(gap)
+        label + h(gap)
       }
     }
 
     set par(
       justify: true,
-      linebreaks: "optimized",
+      linebreaks: "optimized", 
       hanging-indent: if speaker-layout == "blockage" {
         indent-width
       } else { 0em },
@@ -723,5 +740,4 @@
 
 
 #let prop(body) = [#body<prop>]
-
 
