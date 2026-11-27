@@ -420,31 +420,6 @@
   //show heading.where(level:1): set heading(outlined: false)
 
 
-  show <speaker>: it => {
-    if speaker-layout == "fancy" {
-      align(center)[
-        #block(sticky: true, below:0.65em,
-          speaker-function[#it]
-        )
-      ]
-    } else if speaker-layout == "concise"{
-        speaker-function[
-
-          #it:]
-    } else if speaker-layout == "blockage"{
-        let indent-width = calc.min(
-          blockage-indent.to-absolute(),  (measure(
-          speaker-function[#longest-speaker():]
-        ).width + 1em).to-absolute()
-        ) - measure(speaker-function[#it:]
-        ).width - measure([:]).width
-
-        speaker-function[
-
-          #it:#h(calc.max(indent-width, 0pt))]
-    }
-  }
-
   show <parenthetical>: it => {
     if speaker-layout == "fancy" {
       align(center)[
@@ -617,18 +592,45 @@
   }}
 
   context {
-    let indent-width = (measure(
-      speaker-function[#longest-speaker():]
-    ).width + 1em).to-absolute()
-    
+    let indent-width = calc.min(
+      blockage-indent.to-absolute(),
+      (measure(
+        speaker-function[#longest-speaker():]
+      ).width + 1em).to-absolute()
+    )
+
+    show <speaker>: it => {
+      parbreak()
+      if speaker-layout == "fancy" {
+        align(center)[
+          #block(sticky: true, below: 0.65em,
+            speaker-function[#it]
+          )
+        ]
+      } else if speaker-layout == "concise" {
+        speaker-function[#it:]
+      } else if speaker-layout == "blockage" {
+        let label = speaker-function[#it:]
+        let gap = calc.max(
+          indent-width - measure(label).width,
+          0pt
+        )
+        label
+        h(gap)
+      }
+    }
+
     set par(
       justify: true,
       linebreaks: "optimized",
-      hanging-indent: if speaker-layout == "blockage" { calc.min(blockage-indent.to-absolute(), indent-width) } else { 0em },
+      hanging-indent: if speaker-layout == "blockage" {
+        indent-width
+      } else { 0em },
     )
 
     play
   }
+
 
   [#v(0pt)<end_of_play>]
   set page(header: none, footer: none)
