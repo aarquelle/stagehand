@@ -544,7 +544,7 @@
         }
       }
 
-      block(sticky: true, {
+      block(sticky: true, below:1.3em, {
         pretty_print_heading(it.level, counter(heading).get())
         if to-string(it.body) != none {
           [ -- #it.body]
