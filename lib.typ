@@ -420,31 +420,6 @@
   //show heading.where(level:1): set heading(outlined: false)
 
 
-  show <speaker>: it => {
-    if speaker-layout == "fancy" {
-      align(center)[
-        #block(sticky: true, below:0.65em,
-          speaker-function[#it]
-        )
-      ]
-    } else if speaker-layout == "concise"{
-        speaker-function[
-
-          #it:]
-    } else if speaker-layout == "blockage"{
-        let indent-width = calc.min(
-          blockage-indent.to-absolute(),  (measure(
-          speaker-function[#longest-speaker():]
-        ).width + 1em).to-absolute()
-        ) - measure(speaker-function[#it:]
-        ).width - measure([:]).width
-
-        speaker-function[
-
-          #it:#h(calc.max(indent-width, 0pt))]
-    }
-  }
-
   show <parenthetical>: it => {
     if speaker-layout == "fancy" {
       align(center)[
@@ -463,12 +438,6 @@
         _#it _
       ]
     }
-  }
-
-  show regex("\\([^)]+\\)"): it => {
-    if parentheses-mean-stage-directions {
-      stage-direction(blocked: false, it)
-    } else {it}
   }
 
 
@@ -575,7 +544,7 @@
         }
       }
 
-      block(sticky: true, {
+      block(sticky: true, below:1.3em, {
         pretty_print_heading(it.level, counter(heading).get())
         if to-string(it.body) != none {
           [ -- #it.body]
@@ -598,11 +567,34 @@
 
   show par: it => {
     let content = to-string(it.body)
-    let characters = 0
-    if type(content) == str{
-      characters = content.len()
+
+    let direction = if type(content) == str {
+      content.match(
+        regex("^\\s*\\(\\s*(.+)\\s*\\)\\s*$")
+      )
+    } else {
+      none
     }
-    block(breakable: characters > break-size)[#it]
+
+    if parentheses-mean-stage-directions and direction != none {
+      stage-direction(blocked: true)[
+        #direction.captures.at(0)
+      ]
+    } else {
+      let characters = if type(content) == str {
+        content.len()
+      } else {
+        0
+      }
+
+      block(breakable: characters > break-size)[#it]
+    }
+  }
+
+  show regex("\\(.+\\)"): it => {
+    if parentheses-mean-stage-directions {
+      stage-direction(blocked: false, it)
+    } else {it}
   }
 
 
@@ -616,19 +608,46 @@
     }
   }}
 
+
   context {
-    let indent-width = (measure(
-      speaker-function[#longest-speaker():]
-    ).width + 1em).to-absolute()
-    
+    let indent-width = calc.min(
+      blockage-indent.to-absolute(),
+      (measure(
+        speaker-function[#longest-speaker():]
+      ).width + 1em).to-absolute()
+    )
+
+    show <speaker>: it => {
+      parbreak()
+      if speaker-layout == "fancy" {
+        align(center)[
+          #block(sticky: true, below: 0.65em,
+            speaker-function[#it]
+          )
+        ]
+      } else if speaker-layout == "concise" {
+        speaker-function[#it:]
+      } else if speaker-layout == "blockage" {
+        let label = speaker-function[#it:]
+        let gap = calc.max(
+          indent-width - measure(label).width - measure[#sym.space.nobreak].width,
+          0pt
+        )
+        label + h(gap)
+      }
+    }
+
     set par(
       justify: true,
-      linebreaks: "optimized",
-      hanging-indent: if speaker-layout == "blockage" { calc.min(blockage-indent.to-absolute(), indent-width) } else { 0em },
+      linebreaks: "optimized", 
+      hanging-indent: if speaker-layout == "blockage" {
+        indent-width
+      } else { 0em },
     )
 
     play
   }
+
 
   [#v(0pt)<end_of_play>]
   set page(header: none, footer: none)
@@ -721,5 +740,4 @@
 
 
 #let prop(body) = [#body<prop>]
-
 
